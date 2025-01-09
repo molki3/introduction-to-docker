@@ -1,27 +1,24 @@
-const express = require('express')
-const cors = require('cors')
+import express from 'express'
+import mongoose from 'mongoose'
 
-const app = express();
+const Animal = mongoose.model('Animal', new mongoose.Schema({
+  tipo: String,
+  estado: String,
+}))
 
-app.use(cors())
+const app = express()
 
-app.get('/', (req, res) => {
-    res.json([
-        {
-          "id":"1",
-          "title":"Book Review: The Bear & The Nightingale"
-        },
-        {
-          "id":"2",
-          "title":"Game Review: Pokemon Brillian Diamond"
-        },
-        {
-          "id":"3",
-          "title":"Show Review: Alice in Borderland"
-        }
-    ])
+mongoose.connect('mongodb://molki:password@host.docker.internal:27017/myapp?authSource=admin')
+
+app.get('/', async (_req, res) => {
+  console.log('listando...')
+  const animales = await Animal.find();
+  return res.send(animales)
+})
+app.get('/crear', async (_req, res) => {
+  console.log('creando...')
+  await Animal.create({ tipo: 'Chanchito', estado: 'Feliz' })
+  return res.send('ok')
 })
 
-app.listen(4000, () => {
-    console.log('Listen on port 4000')
-})
+app.listen(4000, () => console.log('listening...'))
